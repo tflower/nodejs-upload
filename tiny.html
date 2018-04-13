@@ -28,7 +28,7 @@
     inpt.addEventListener('change',function(e){
         console.log(inpt.files[0])
         var formData = new FormData();
-        // formData.append('type', 'png');
+        formData.append('type', 'png');
         formData.append('file', inpt.files[0]);
 		console.log(formData)
         $.ajax({

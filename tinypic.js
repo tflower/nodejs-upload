@@ -36,22 +36,37 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
-var upload = multer({ dest: './images/' }); // for parsing multipart/form-data
+// var upload = multer({ dest: './images/' }); // for parsing multipart/form-data
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './images/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname); // modified here  or user file.mimetype
+    }
+  })
+  
+  var upload = multer({ storage: storage }).single('file');
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // POST method route
-app.post('/', upload.single('file'), function (req, res) {
-    console.log(req.method)
-    console.log(req.body)
-    res.set({
-        'Content-Type': 'text/plain',
-        'Content-Length': '123',
-        'ETag': '12345',
-        'Access-Control-Allow-Origin':'*'
-    });
-    res.json(req.body);
+app.post('/', function (req, res) {
+    upload(req,res,function(err){
+        console.log(req.file)
+        console.log(req.body)
+        res.set({
+            'Content-Type': 'text/plain',
+            'Content-Length': '123',
+            'ETag': '12345',
+            'Access-Control-Allow-Origin':'*'
+        });
+        res.json(req.body);
+    })
+    
+    
+   
 });
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!');
